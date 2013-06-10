@@ -1,12 +1,12 @@
-#***************************
+
 # Scripts
-#***************************
+
 
 Some bash scripts I wrote.
 
-#***************************
+
 # mampdebug
-#***************************
+
 
 This script will monitor the error log files for MAMP.  To set up, place the path to your log files in the variable MYPATH.
 If you choose, create an alias to the script file.
