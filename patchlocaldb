@@ -1,0 +1,76 @@
+#!/bin/bash
+
+#***********************************************
+# patchlocaldb
+# Author: Matt Machado
+# Date: June 7th, 2013
+# Purpose: A script to automate the update of
+#          the database in the local envrionment
+#          from a dump file.
+#***********************************************
+
+SSHLOC="USER@HOST"
+FILE=
+DBHOST="localhost"
+DB="mydb"
+PATCHDB="mysql -u root -proot -h $DBHOST $DB"
+NUMARGS=$#
+
+FILES="ls -t DEV_DUMP_*.sql"
+NEWEST="head -1"
+
+# Check to see if a file was input
+if [[ $NUMARGS -eq 1 ]] ; then
+	
+	#Check if file exists.
+	if [[ -e $1 ]] ; then
+		FILE=$1
+
+		#Ensure that file is of the right type.
+		if [[ $FILE == *.sql ]] ; then
+			echo "The database $DB on $DBHOST is being updated with $FILE.  This may take a while..."
+			$PATCHDB < $FILE
+		else
+			echo "ERROR: The file must have the extension .sql"
+			exit -1
+		fi
+
+	else
+		echo "ERROR: The file does not exist."
+		exit -1
+	fi
+
+elif [[ $NUMARGS -eq 0 ]] ; then
+
+	# SSH into server and find most recent file.
+	FILE=`ssh $SSHLOC $FILES | $NEWEST`
+
+	# Download the file.
+	echo "Now downloading $FILE..."
+	scp $SSHLOC:$FILE ./
+
+	# If the file was downlaoded, then update the database.
+	if [[ $? -eq 0 ]] ; then
+		echo "The database $DB on $DBHOST is being updated with $FILE.  This may take a while..."
+		$PATCHDB < $FILE 
+
+		# remove the file.
+		rm $FILE
+	else
+		echo "ERROR: File was a problem downloading the file $FILE.  Please check with your server administrator."
+		exit -1
+	fi
+
+else
+	echo "Error: patchlocaldb takes 0 or 1 arguments."
+	exit -1
+fi
+
+# Check if the db was successfully updated.
+# PATCHDB will be the last function executed in every successful branch of the program.
+if [[ $? -ne 0 ]] ; then
+	echo "ERROR: The database failed to properly update.  Please make sure $FILE is the correct file."
+	exit -1
+else
+	echo "The database was updated successfully."
+fi

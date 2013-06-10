@@ -1,0 +1,100 @@
+#!/bin/bash
+
+#***********************************************
+# mampdebug
+# Author: Matt Machado
+# Date: June 7th, 2013
+# Purpose: A script to aid in the debugging of 
+#          php and mysql running in MAMP.
+#***********************************************
+
+# underline
+ULINE=`tput smul`
+NULINE=`tput rmul`
+
+# bold
+BOLD=`tput bold`
+NBOLD=`tput sgr0`
+
+function usage {
+	# I'm sure there is a better way to do this...
+	echo -e ${BOLD}"NAME\n"${NBOLD}" 	mampdebug\n"
+
+	echo -e ${BOLD}"SYNOPSIS\n"${NBOLD}" 	mampdump ["${ULINE}"options"${NULINE}"] ["${BOLD}"-a"${NBOLD}${ULINE}" APPLICATION"${NULINE}"]\n"
+
+	echo -e ${BOLD}"DESCRIPTION\n"${NBOLD}"	mampdebug displays the error log for the application named "${ULINE}"APPLICATION"${NULINE}" running in mamp, and then continuously monitors the file for debugging.\n"
+
+	echo -e ${BOLD}"OPTIONS\n	-a "${NBOLD} ${ULINE}"APPLICATION"${NULINE}
+	echo -e "		Display error log for "${ULINE}"APPLICATION"${NULINE}".  Can be one of 'php' or 'mysql'.\n"
+
+	echo -e ${BOLD}"	-c"${NBOLD}
+	echo -e "		This flag will cause mampdebug to clear the error log before monitoring it.\n"
+
+	echo -e ${BOLD}"	-m"${NBOLD}
+	echo -e "		If this flas is used, the program will not be run, and the manual page will be shown.\n"
+}
+
+MYPATH="/Applications/MAMP/logs"
+MESSAGE=
+FILE=
+NULLIFY="cat null"
+CLEAR=0
+
+# Minor argument checking that getopts won't catch.
+if [[ "$1" != "-c" ]] && [[ "$1" != "-m" ]] && [[ "$1" != "-a" ]] && ( [[ $# -lt 2 ]] || [[ $# -gt 4 ]] ) ; then
+
+	echo "ERROR: Incorrect use of mampdebug, run with the -m flag for the manual page."
+	usage
+	exit -1
+
+fi 
+
+while getopts "a:cm" OPTION ; do
+
+	case $OPTION in
+		m)
+			usage
+			exit 0
+			;;
+		a)
+			if [[ "$OPTARG" == "php" ]] ; then
+
+				FILE="php_error.log"
+				MESSAGE="Now viewing MAMP php error log:"
+				
+			elif [[ "$OPTARG" == "mysql" ]] ; then
+
+				FILE="mysql_error_log.err"
+				MESSAGE="Now viewing MAMP mysql error log:"
+
+			else
+
+				echo "ERROR: Invalid argument for flag -a, see manual page below."
+				usage
+				exit -1
+			fi
+			;;
+		c)
+			CLEAR=1
+			;;
+		?)
+			usage
+			exit -1
+			;;
+	esac
+
+done
+
+# Run the commands.
+cd $MYPATH
+
+# if the clear flag has been used.
+if [ $CLEAR -eq 1 ] ; then
+	
+	$NULLIFY > $FILE
+	echo "$FILE has been cleared."
+
+fi
+
+echo $MESSAGE
+tail -100lf $FILE
