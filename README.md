@@ -1,4 +1,3 @@
-
 # Scripts
 
 
@@ -14,9 +13,7 @@ If you choose, create an alias to the script file.
 The -a flag is mandatory, and it is followed by either "php" or "mysql".  It will monitor the corresponding error log.
 The -c flaf will first clear the file before monitoring.  The -m flag will not run the script but display the usage file.
 
-#***************************
 # patchlocaldb
-#***************************
 
 To set this up, you must add the ssh user@host to the variable SSHLOC.  Then update the DBHOST and DB variables as
 appropriate for your system.
