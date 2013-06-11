@@ -1,0 +1,48 @@
+#!/bin/bash
+
+#***********************************************
+# vslocalenv
+# Author: Matt Machado
+# Date: June 8th, 2013
+# Purpose: A simple script to start up the local
+#          environment for developing the VS
+#          applications.
+#***********************************************
+
+MAMPPATH="/Applications/MAMP/MAMP.app"
+
+function checkLastCommand {
+
+	if [[ $? -ne 0 ]] ; then
+		echo "ERROR: Something went wrong opening $1."
+		exit -1
+	fi
+
+}
+
+echo "Now starting the Veloxsites Local Development Environment.  See README for more information."
+
+# Open new tab and run php debug.
+osascript -e 'tell app "System Events"' -e 'keystroke "t" using command down' -e 'end tell' -e 'tell app "System Events"' -e 'keystroke "mampdebug -a php -c"' -e 'keystroke return' -e 'end tell'
+checlLastCommand "MAMP PHP debug"
+echo "MAMP PHP Debug running."
+
+# Open another tab and run mysql debug
+osascript -e 'tell app "System Events"' -e 'keystroke "t" using command down' -e 'end tell' -e 'tell app "System Events"' -e 'keystroke "mampdebug -a mysql -c"' -e 'keystroke return' -e 'end tell'
+checkLastCommand "MAMP MySQL Debug"
+echo "MAMP MySQL Debug running."
+
+# Change back to first tab.
+osascript -e 'tell app "system Events"' -e 'key down shift' -e 'keystroke "}" using command down' -e 'key up shift' -e 'end tell'
+
+open $MAMPPATH
+checkLastCommand "MAMP" 
+echo "MAMP running."
+
+open /Applications/NetBeans/NetBeans\ 7.0.1.app
+checkLastCommand "NetBeans 7.0.1"
+echo "NetBeans 7.0.1 Running."
+
+echo "VS Development Envrionment successfully started."
+
+exit $?
