@@ -25,3 +25,6 @@ patch the database, and delete the file.
 This script will prompt you for your password twice.  This is a hastle, and can be rectified by setting up SSH Key login
 to the server the script will SSH to.  A google search will yield results on how to do this, it does not take long.
 
+# vslocalenv
+
+This script simply opens the programs and terminal debugging I need for development.  
