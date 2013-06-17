@@ -43,16 +43,17 @@ if [[ $NUMARGS -eq 1 ]] ; then
 elif [[ $NUMARGS -eq 0 ]] ; then
 
 	# SSH into server and find most recent file.
-	FILE=`ssh $SSHLOC $FILES | $NEWEST`
+	FILE=`ssh $SSHLOC 'ls -t DEV_DUMP_*.sql | head -1'`
 
 	# Download the file.
 	echo "Now downloading $FILE..."
-	scp $SSHLOC:$FILE ./
+	scp $SSHLOC:$FILE ~/
 
 	# If the file was downlaoded, then update the database.
 	if [[ $? -eq 0 ]] ; then
 		echo "The database $DB on $DBHOST is being updated with $FILE.  This may take a while..."
-		$PATCHDB < $FILE 
+		$PATCHDB -e 'set names utf8; source ~/'$FILE';';
+		
 
 		# remove the file.
 		rm $FILE
