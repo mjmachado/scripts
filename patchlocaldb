@@ -16,9 +16,6 @@ DB="mydb"
 PATCHDB="mysql -u root -proot -h $DBHOST $DB"
 NUMARGS=$#
 
-FILES="ls -t DEV_DUMP_*.sql"
-NEWEST="head -1"
-
 # Check to see if a file was input
 if [[ $NUMARGS -eq 1 ]] ; then
 	
